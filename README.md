@@ -1,6 +1,6 @@
 # On-behalf-of flow with Entra ID and FastMCP
 
-Blog post: 
+Blog post: https://baeke.info/2025/07/29/end-to-end-authorization-with-entra-id-and-mcp/
 
 ## Instructions
 
