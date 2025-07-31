@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple MCP Server with one reverse tool and Azure Entra ID authentication
+Simple MCP Server with with Azure Entra ID Authentication and OBO flow for Microsoft Search
 """
 
 import logging
@@ -55,7 +55,7 @@ mcp = FastMCP("Simple Reverse Server with Azure Auth", auth=auth)
 # Without authentication, just for testing
 # mcp = FastMCP("Simple Reverse Server with Azure Auth")
 
-async def exchange_token(original_token: str, scope: str = "https://graph.microsoft.com/.default") -> dict:
+async def exchange_token(original_token: str, scope: str) -> dict:
     """
     Exchange JWT token for downstream service token using OBO flow
     """
