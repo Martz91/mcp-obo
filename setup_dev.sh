@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Check if .venv directory exists
+if [ ! -d ".venv" ]; then
+    echo "Creating virtual environment..."
+    python3 -m venv .venv
+fi
+
+# Activate virtual environment
+echo "Activating virtual environment..."
+source .venv/bin/activate
+
+# Install requirements if requirements.txt exists
+if [ -f "requirements.txt" ]; then
+    echo "Installing requirements..."
+    pip install -r requirements.txt
+else
+    echo "No requirements.txt found, skipping installation."
+fi
+
+echo "Setup complete!"

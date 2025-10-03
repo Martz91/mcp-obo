@@ -145,23 +145,75 @@ async def get_documents(ctx: Context, query: str = "*") -> dict:
 
     # Exchange token for Microsoft Search token
     logger.info("Exchanging token for Microsoft Search access")
-    search_result = await exchange_token(original_token, scope="https://search.azure.com/.default")
-    if not search_result["success"]:
+    exchange_token_result = await exchange_token(original_token, scope="https://graph.microsoft.com/.default")
+    if not exchange_token_result["success"]:
         return {"error": "Could not retrieve documents due to token exchange failure."}
     else:
         logger.info("Search token exchange successful")
-        search_token = search_result["access_token"]
-        search_client = SearchClient(endpoint="https://srch-geba.search.windows.net", index_name="document-permissions-push-idx", credential=AzureKeyCredential(os.getenv("AZURE_SEARCH_KEY")))
-        results = search_client.search(search_text="*", x_ms_query_source_authorization=search_token, select="name,oid,group", order_by="id asc")
+        graph_token = exchange_token_result["access_token"]
+
+        logger.info("Now I am getting all the search results from SharePoint ... not!")
+
         documents = [
             {
-            "name": result.get("name"),
-            "oid": result.get("oid"),
-            "group": result.get("group")
+            "name": "New Document",
+            "oid": "Some oid",
+            "group": "Aaaaand a group"
             }
-            for result in results
         ]
         return {"documents": documents}
+    
+@mcp.tool()
+async def get_loggedin_user(ctx: Context) -> dict:
+    """
+    Retrieve information about the currently logged in user from Microsoft Graph
+    
+    Args:
+        ctx: FastMCP context
+        
+    Returns:
+        - display_name: User's display name
+        - email: User's email address (mail or userPrincipalName)
+        - user_principal_name: User's UPN
+        - id: User's unique identifier
+        - job_title: User's job title (if available)
+        - office_location: User's office location (if available)
+    """
+    logger.info("get_loggedin_user called.")
+    # Get the access token from the context
+    access_token: AccessToken = get_access_token()
+    original_token = access_token.token
+
+    # Exchange token for Microsoft Search token
+    logger.info("Exchanging token for Microsoft Graph API access")
+    exchange_token_result = await exchange_token(original_token, scope="https://graph.microsoft.com/.default")
+
+    if not exchange_token_result["success"]:
+        return {"error": "Could not retrieve logged in user due to token exchange failure."}
+    else:
+        logger.info("Graph API token exchange successful")
+        graph_token = exchange_token_result["access_token"]
+
+        headers = {
+            'Authorization': f'Bearer {graph_token}',
+            'Content-Type': 'application/json'
+        }
+        
+        # Make request to Microsoft Graph /me endpoint
+        response = requests.get('https://graph.microsoft.com/v1.0/me', headers=headers)
+        
+        if response.status_code == 200:
+            user_data = response.json()
+            return {
+                'display_name': user_data.get('displayName'),
+                'email': user_data.get('mail') or user_data.get('userPrincipalName'),
+                'user_principal_name': user_data.get('userPrincipalName'),
+                'id': user_data.get('id'),
+                'job_title': user_data.get('jobTitle'),
+                'office_location': user_data.get('officeLocation')
+            }
+        else:
+            raise Exception(f"Failed to get user profile: {response.status_code} - {response.text}")
     
 def main():
     """Main entry point for the FastMCP server"""
