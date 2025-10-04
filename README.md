@@ -1,6 +1,8 @@
 # On-behalf-of flow with Entra ID and FastMCP
 
-Blog post: https://baeke.info/2025/07/29/end-to-end-authorization-with-entra-id-and-mcp/
+This is a Fork of gbaeke`s implementation that uses the Microsoft Graph /me Endpoind instead of AI Search to make the sample a bit more accessible.
+
+Blog post for the original implementation: https://baeke.info/2025/07/29/end-to-end-authorization-with-entra-id-and-mcp/
 
 ## Instructions
 
@@ -20,11 +22,12 @@ pip install -r requirements.txt
 ### 3. Set up environment variables
 
 Create a `.env` file in the project root with the required Azure and API credentials (see example files for required variables).
+See `AZURE_SETUP.md` for instructions on how to setup the Azure AD App Registrations.
 
 ### 4. Start the MCP server
 
 ```bash
-python -m mcp.main
+python mcp/main.py
 ```
 
 ### 5. Run the MCP client
@@ -35,6 +38,12 @@ In a new terminal (with the virtual environment activated):
 python mcp_client.py
 ```
 
+### 6. Configure the MCP server in VSCode (to use with Github Copilot)
+
+Open the file `.vscode/mcp.json` in VSCode. The MCP Server is defined in there already. Replace `<Entra Id Token>` with your Entra Id Access token.
+To obtain the token you can use `python get_token.py`.
+
+As long as the token is valid, Copilot can use the MCP Server in Agent Mode.
 
 ## Diagrams
 
