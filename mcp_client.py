@@ -203,17 +203,9 @@ async def connect_mcp(skip_auth: bool = False):
             
 
             # Call search tool
-            logger.info("Calling search tool...")
-            search_result = await client.call_tool("get_documents", {"query": "*"})
-            logger.info(f"Search Result: {search_result.structured_content}")
-            documents = search_result.structured_content.get("documents", [])
-            if documents:
-                logger.info("Documents found:")
-                for doc in documents:
-                    name = doc.get("name", "Unnamed Document")
-                    logger.info(f"  - {name}")
-            else:
-                logger.info("No documents found.")
+            logger.info("Calling get user info tool...")
+            user_detail = await client.call_tool("get_loggedin_user", {})
+            logger.info(f"Result: {user_detail.structured_content}")
         
     except Exception as e:
         logger.error(f"Error connecting to MCP server: {e}")

@@ -125,43 +125,6 @@ def decode_token_info(token: str) -> dict:
     except Exception as e:
         return {"error": str(e)}
 
-
-@mcp.tool()
-async def get_documents(ctx: Context, query: str = "*") -> dict:
-    """
-    Retrieve documents from Azure Search using the provided query.
-    
-    Args:
-        ctx: FastMCP context
-        query: The search query
-        
-    Returns:
-        list of documents
-    """
-    logger.info(f"get_documents called with query: {query}")
-    # Get the access token from the context
-    access_token: AccessToken = get_access_token()
-    original_token = access_token.token
-
-    # Exchange token for Microsoft Search token
-    logger.info("Exchanging token for Microsoft Search access")
-    exchange_token_result = await exchange_token(original_token, scope="https://graph.microsoft.com/.default")
-    if not exchange_token_result["success"]:
-        return {"error": "Could not retrieve documents due to token exchange failure."}
-    else:
-        logger.info("Search token exchange successful")
-        graph_token = exchange_token_result["access_token"]
-
-        logger.info("Now I am getting all the search results from SharePoint ... not!")
-
-        documents = [
-            {
-            "name": "New Document",
-            "oid": "Some oid",
-            "group": "Aaaaand a group"
-            }
-        ]
-        return {"documents": documents}
     
 @mcp.tool()
 async def get_loggedin_user(ctx: Context) -> dict:
